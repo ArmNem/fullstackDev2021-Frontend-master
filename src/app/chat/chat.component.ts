@@ -5,6 +5,8 @@ import {Observable, Subject, Subscription} from 'rxjs';
 import {debounceTime, take, takeUntil} from 'rxjs/operators';
 import {ChatClientModule} from './shared/chat-client.model';
 import {ChatMessage} from './shared/chat-message.model';
+import {JoinChatDto} from './shared/join-chat.dto';
+import {StorageService} from '../shared/storage.service';
 
 @Component({
   selector: 'app-chat',
@@ -23,7 +25,7 @@ export class ChatComponent implements OnInit, OnDestroy {
   clientsTyping: ChatClientModule[] = [];
   socketID: string | undefined;
 
-  constructor(private chatService: ChatService) {
+  constructor(private chatService: ChatService, private storageService: StorageService) {
   }
 
   ngOnInit(): void {
@@ -47,10 +49,12 @@ export class ChatComponent implements OnInit, OnDestroy {
     });
     this.chatService.listenForWelcome().pipe(takeUntil(this.unsub$)).subscribe(welcome => {
       this.messages = welcome.messages;
-      this.chatClient = this.chatService.chatClient = welcome.client;
+      this.chatClient = welcome.client;
+      this.storageService.saveChatClient(this.chatClient);
     });
-    if (this.chatService.chatClient) {
-      this.chatService.sendName(this.chatService.chatClient.name);
+    const oldClient = this.storageService.loadChatClient();
+    if (oldClient) {
+      this.chatService.joinChat({id: oldClient.id, name: oldClient.name});
     }
     this.chatService.listenForConnect()
       .pipe(
@@ -80,7 +84,8 @@ export class ChatComponent implements OnInit, OnDestroy {
 
   sendName(): void {
     if (this.nameFC.value) {
-      this.chatService.sendName(this.nameFC.value);
+      const dto: JoinChatDto = {name: this.nameFC.value};
+      this.chatService.joinChat(dto);
     }
   }
 }

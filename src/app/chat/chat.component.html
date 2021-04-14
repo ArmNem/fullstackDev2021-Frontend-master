@@ -23,7 +23,7 @@
   </div>
   <div fxLayout="column" fxFlex="80">
     <mat-card fxFlex fxLayout="column">
-      <mat-card-header><h5>Hello {{chatClient.name}} {{socketID}}</h5></mat-card-header>
+      <mat-card-header><h5>Hello {{chatClient.name}} {{chatClient.id}}</h5></mat-card-header>
       <mat-card-content fxFlex fxLayout="column">
         <mat-list fxFlex class="scrollable">
           <mat-list-item *ngFor="let chatMessage of messages">

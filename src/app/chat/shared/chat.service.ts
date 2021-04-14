@@ -5,12 +5,13 @@ import {ChatClientModule} from './chat-client.model';
 import {ChatMessage} from './chat-message.model';
 import {WelcomeDto} from './welcome.dto';
 import {map} from 'rxjs/operators';
+import {JoinChatDto} from './join-chat.dto';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ChatService {
-  chatClient: ChatClientModule | undefined;
+
 
   constructor(private socket: Socket) {
   }
@@ -67,8 +68,8 @@ export class ChatService {
     return this.socket.fromEvent<ChatMessage[]>('allMessages');
   }
 
-  sendName(name: string): void {
-    this.socket.emit('name', name);
+  joinChat(dto: JoinChatDto): void {
+    this.socket.emit('joinchat', dto);
   }
 
   disconnect(): void {
