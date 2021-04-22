@@ -6,6 +6,7 @@ import {AllStocksDto} from './all-stock.dto';
 import {ChangePriceDto} from './change-price.dto';
 import {Socket} from 'ngx-socket-io';
 import {map} from 'rxjs/operators';
+import {ChatClientModule} from '../../chat/shared/chat-client.model';
 
 @Injectable({
   providedIn: 'root'
@@ -30,11 +31,12 @@ export class StockService {
       .fromEvent<string>('error');
   }
 
-  listenForStocks(): any{
-    return this.socketStocks
+  listenForStocks(): Observable<StockDto[]>{
+   /* return this.socketStocks
       .fromEvent<AllStocksDto>('allStocks').pipe(map((data) => {
         return data;
-      }));
+      }));*/
+    return this.socketStocks.fromEvent<StockDto[]>('stocks');
   }
 
   disconnect(): void{

@@ -7,6 +7,9 @@ import {ChangePriceDto} from './shared/change-price.dto';
 import {map, takeUntil} from 'rxjs/operators';
 import {AllStocksDto} from './shared/all-stock.dto';
 import {Socket} from 'ngx-socket-io';
+import {StopListeningForClients} from '../chat/state/chat.actions';
+import {StopListeningForStocks} from './state/stock.actions';
+import {Store} from '@ngxs/store';
 
 @Component({
   selector: 'app-stock',
@@ -17,10 +20,10 @@ export class StockComponent implements OnInit, OnDestroy {
   unsubscribe$ = new Subject();
   stocks: StockDto[] | undefined;
   error$: Observable<string> | undefined;
-  selectedStock: StockDto| undefined;
+  selectedStock: StockDto | undefined;
   priceFc = new FormControl('');
 
-  constructor(private stockService: StockService) {
+  constructor(private store: Store, private stockService: StockService) {
     // @ts-ignore
     this.stockService.getStocks();
   }
@@ -36,34 +39,35 @@ export class StockComponent implements OnInit, OnDestroy {
       // @ts-ignore
       .subscribe((dto) => {
         console.log(dto);
-        this.stocks = dto.stocks;
+        this.stocks = dto;
         this.selectedStock = undefined;
       });
   }
+
   ngOnDestroy(): void {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
-   // this.stockService.disconnect();
+    this.store.dispatch(new StopListeningForStocks());
   }
 
-  createStock(): void{
+  createStock(): void {
     const stock: StockDto = {name: 'microsoft', value: 448, description: 'good stock'};
     this.stockService.create(stock);
   }
 
-  selectStock(stock: StockDto): void{
+  selectStock(stock: StockDto): void {
     this.selectedStock = stock;
     this.priceFc.setValue(stock.value);
   }
 
   changePrice(): void {
-    if (this.selectedStock?.id && !Number.isNaN(this.priceFc.value)){
+    if (this.selectedStock?.id && !Number.isNaN(this.priceFc.value)) {
       const dto: ChangePriceDto = {id: this.selectedStock.id, newPrice: this.priceFc.value};
       this.stockService.changePrice(dto);
     }
   }
 
-  updateStock(): void{
+  updateStock(): void {
 
   }
 

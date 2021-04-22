@@ -6,6 +6,9 @@ import {AppComponent} from './app.component';
 import {Socket, SocketIoConfig, SocketIoModule} from 'ngx-socket-io';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {SharedModule} from './shared/shared.module';
+import {environment} from '../environments/environment';
+import {NgxsModule} from '@ngxs/store';
+import {ChatState} from './chat/state/chat.state';
 
 const config: SocketIoConfig = {url: 'http://localhost:5000', options: {}};
 
@@ -35,7 +38,10 @@ export class SocketStock extends Socket {
     AppRoutingModule,
     SocketIoModule.forRoot(config),
     BrowserAnimationsModule,
-    SharedModule
+    SharedModule,
+    NgxsModule.forRoot([ChatState], {
+      developmentMode: !environment.production
+    })
 
 
   ],

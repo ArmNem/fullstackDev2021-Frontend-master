@@ -1,4 +1,4 @@
 export interface ChangePriceDto {
   id: string;
-  newPrice: number;
+  newPrice?: number;
 }
